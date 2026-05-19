@@ -134,7 +134,7 @@ jobs:
           echo "Target Qt:  $QT_ROOT_DIR"
           echo "Host Qt:    $QT_HOST_PATH"
           cmake -S . -B build-android \
-            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_BUILD_TYPE=Debug \
             -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" \
             -DQT_HOST_PATH="$QT_HOST_PATH" \
             -DCMAKE_TOOLCHAIN_FILE="$QT_ROOT_DIR/lib/cmake/Qt6/qt.toolchain.cmake" \
