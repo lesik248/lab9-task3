@@ -188,7 +188,7 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_WASM_VERSION }}
-          host: linux
+          host: all_os
           target: wasm
           arch: wasm_singlethread
           modules: qtshadertools qtmultimedia
@@ -285,10 +285,15 @@ jobs:
             -DQT_HOST_PATH="$QT_HOST_PATH" \
             -DCMAKE_TOOLCHAIN_FILE="$QT_ROOT_DIR/lib/cmake/Qt6/qt.toolchain.cmake" \
             -DCMAKE_OSX_ARCHITECTURES="arm64" \
-            -DCMAKE_OSX_SYSROOT=iphoneos
+            -DCMAKE_OSX_SYSROOT=iphoneos \
+            -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_ALLOWED=NO \
+            -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=NO \
+            -DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=""
 
       - name: Build
-        run: cmake --build build-ios --config Release --parallel
+        run: |
+          cmake --build build-ios --config Release --parallel -- \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
 
       - uses: actions/upload-artifact@v4
         with:

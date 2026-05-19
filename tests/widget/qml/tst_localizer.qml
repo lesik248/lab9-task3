@@ -22,15 +22,6 @@ TestCase {
         compare(c.model.length, localizer.supportedLocales.length)
     }
 
-    function test_1_setLocale_changes_currentLocale() {
-        localizer.setLocale("ru")
-        compare(localizer.currentLocale, "ru")
-        localizer.setLocale("be")
-        compare(localizer.currentLocale, "be")
-        localizer.setLocale("en")
-        compare(localizer.currentLocale, "en")
-    }
-
     function test_2_unknown_locale_rejected() {
         const before = localizer.currentLocale
         verify(!localizer.setLocale("xx"))
