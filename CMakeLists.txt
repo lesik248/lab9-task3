@@ -149,12 +149,13 @@ if(NOT EMSCRIPTEN AND NOT ANDROID AND NOT IOS)
         src/platforminfo.h src/platforminfo.cpp
         src/localizer.h src/localizer.cpp
     )
-    # Re-register shared QML types under a private module so test
-    # .qml files can `import GuessNumberX` and instantiate GameCore etc.
+    # Re-register shared QML types under a *private* module so test
+    # .qml files can `import GuessNumberXTest` and instantiate GameCore etc.
     qt_add_qml_module(tst_widget
-        URI GuessNumberX
+        URI GuessNumberXTest
         VERSION 1.0
         NO_PLUGIN
+        OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/GuessNumberXTest
         QML_FILES
             qml/shared/GameCore.qml
             qml/shared/GameAnimations.qml

@@ -17,6 +17,7 @@ concurrency:
 
 env:
   QT_VERSION: 6.7.3
+  QT_WASM_VERSION: 6.6.3
 
 jobs:
   linux:
@@ -36,7 +37,7 @@ jobs:
             libxcb-xfixes0 libxcb-xinerama0 libxcb-xkb1 libxkbcommon-x11-0 \
             xvfb
 
-      - name: Install Qt
+      - name: Install Qt (Linux desktop)
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
@@ -50,7 +51,7 @@ jobs:
         run: |
           cmake -S . -B build -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH="$Qt6_DIR"
+            -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR"
 
       - name: Build
         run: cmake --build build --parallel
@@ -63,7 +64,6 @@ jobs:
       - name: Package
         run: |
           cd build
-          cmake --install . --prefix dist || true
           tar -czf guessnumberx-linux-x64.tar.gz appGuessNumberX || true
 
       - uses: actions/upload-artifact@v4
@@ -85,7 +85,7 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Install host Qt (needed for cross-build)
+      - name: Install host Qt (Linux desktop, needed for cross-build)
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
@@ -94,10 +94,11 @@ jobs:
           arch: linux_gcc_64
           modules: qtshadertools qtmultimedia
           cache: true
-          set-env: false
 
       - name: Save host Qt path
-        run: echo "QT_HOST_PATH=$Qt6_DIR" >> $GITHUB_ENV
+        run: |
+          echo "QT_HOST_PATH=$QT_ROOT_DIR" >> $GITHUB_ENV
+          echo "Captured host Qt: $QT_ROOT_DIR"
 
       - name: Install Android Qt
         uses: jurplel/install-qt-action@v4
@@ -119,11 +120,13 @@ jobs:
 
       - name: Configure
         run: |
+          echo "Target Qt:  $QT_ROOT_DIR"
+          echo "Host Qt:    $QT_HOST_PATH"
           cmake -S . -B build-android \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH="$Qt6_DIR" \
+            -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" \
             -DQT_HOST_PATH="$QT_HOST_PATH" \
-            -DCMAKE_TOOLCHAIN_FILE="$Qt6_DIR/lib/cmake/Qt6/qt.toolchain.cmake" \
+            -DCMAKE_TOOLCHAIN_FILE="$QT_ROOT_DIR/lib/cmake/Qt6/qt.toolchain.cmake" \
             -DANDROID_NDK_ROOT="$ANDROID_NDK_ROOT" \
             -DANDROID_PLATFORM=android-23 \
             -DANDROID_ABI=arm64-v8a
@@ -150,29 +153,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install host Qt
+      - name: Install Emscripten 3.1.37 (matches Qt 6.6.x)
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.37
+
+      - name: Install host Qt (Linux desktop, matching WASM version)
         uses: jurplel/install-qt-action@v4
         with:
-          version: ${{ env.QT_VERSION }}
+          version: ${{ env.QT_WASM_VERSION }}
           host: linux
           target: desktop
           arch: linux_gcc_64
           modules: qtshadertools qtmultimedia
           cache: true
-          set-env: false
 
       - name: Save host Qt path
-        run: echo "QT_HOST_PATH=$Qt6_DIR" >> $GITHUB_ENV
-
-      - name: Install Emscripten
-        uses: mymindstorm/setup-emsdk@v14
-        with:
-          version: 3.1.50
+        run: |
+          echo "QT_HOST_PATH=$QT_ROOT_DIR" >> $GITHUB_ENV
+          echo "Captured host Qt: $QT_ROOT_DIR"
 
       - name: Install Qt for WebAssembly
         uses: jurplel/install-qt-action@v4
         with:
-          version: ${{ env.QT_VERSION }}
+          version: ${{ env.QT_WASM_VERSION }}
           host: linux
           target: wasm
           arch: wasm_singlethread
@@ -181,11 +185,13 @@ jobs:
 
       - name: Configure
         run: |
+          echo "Target Qt:  $QT_ROOT_DIR"
+          echo "Host Qt:    $QT_HOST_PATH"
           cmake -S . -B build-wasm \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH="$Qt6_DIR" \
+            -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" \
             -DQT_HOST_PATH="$QT_HOST_PATH" \
-            -DCMAKE_TOOLCHAIN_FILE="$Qt6_DIR/lib/cmake/Qt6/qt.toolchain.cmake"
+            -DCMAKE_TOOLCHAIN_FILE="$QT_ROOT_DIR/lib/cmake/Qt6/qt.toolchain.cmake"
 
       - name: Build
         run: cmake --build build-wasm --parallel
@@ -231,7 +237,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install host Qt
+      - name: Install host Qt (mac desktop)
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_VERSION }}
@@ -240,10 +246,9 @@ jobs:
           arch: clang_64
           modules: qtshadertools qtmultimedia
           cache: true
-          set-env: false
 
       - name: Save host Qt path
-        run: echo "QT_HOST_PATH=$Qt6_DIR" >> $GITHUB_ENV
+        run: echo "QT_HOST_PATH=$QT_ROOT_DIR" >> $GITHUB_ENV
 
       - name: Install iOS Qt
         uses: jurplel/install-qt-action@v4
@@ -256,11 +261,13 @@ jobs:
 
       - name: Configure
         run: |
+          echo "Target Qt:  $QT_ROOT_DIR"
+          echo "Host Qt:    $QT_HOST_PATH"
           cmake -S . -B build-ios -G Xcode \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_PREFIX_PATH="$Qt6_DIR" \
+            -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" \
             -DQT_HOST_PATH="$QT_HOST_PATH" \
-            -DCMAKE_TOOLCHAIN_FILE="$Qt6_DIR/lib/cmake/Qt6/qt.toolchain.cmake" \
+            -DCMAKE_TOOLCHAIN_FILE="$QT_ROOT_DIR/lib/cmake/Qt6/qt.toolchain.cmake" \
             -DCMAKE_OSX_ARCHITECTURES="arm64" \
             -DCMAKE_OSX_SYSROOT=iphonesimulator
 
