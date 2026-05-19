@@ -148,6 +148,7 @@ if(NOT EMSCRIPTEN AND NOT ANDROID AND NOT IOS)
         src/settingsmanager.h src/settingsmanager.cpp
         src/platforminfo.h src/platforminfo.cpp
         src/localizer.h src/localizer.cpp
+        src/drophandler.h src/drophandler.cpp
     )
     # Re-register shared QML types under a *private* module so test
     # .qml files can `import GuessNumberXTest` and instantiate GameCore etc.
