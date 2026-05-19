@@ -17,7 +17,7 @@ concurrency:
 
 env:
   QT_VERSION: 6.7.3
-  QT_WASM_VERSION: 6.6.3
+  QT_WASM_VERSION: 6.5.3
 
 jobs:
   linux:
@@ -153,27 +153,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Emscripten 3.1.37 (matches Qt 6.6.x)
+      - name: Install Emscripten 3.1.25 (matches Qt 6.5.x)
         uses: mymindstorm/setup-emsdk@v14
         with:
-          version: 3.1.37
+          version: 3.1.25
 
-      - name: Install host Qt (Linux desktop, matching WASM version)
-        uses: jurplel/install-qt-action@v4
-        with:
-          version: ${{ env.QT_WASM_VERSION }}
-          host: linux
-          target: desktop
-          arch: linux_gcc_64
-          modules: qtshadertools qtmultimedia
-          cache: true
-
-      - name: Save host Qt path
-        run: |
-          echo "QT_HOST_PATH=$QT_ROOT_DIR" >> $GITHUB_ENV
-          echo "Captured host Qt: $QT_ROOT_DIR"
-
-      - name: Install Qt for WebAssembly
+      # One step: install-qt-action with target=wasm + autodesktop true
+      # also installs the matching host Linux desktop Qt and exports
+      # QT_HOST_PATH automatically.
+      - name: Install Qt for WebAssembly (with autodesktop host)
         uses: jurplel/install-qt-action@v4
         with:
           version: ${{ env.QT_WASM_VERSION }}
@@ -181,12 +169,18 @@ jobs:
           target: wasm
           arch: wasm_singlethread
           modules: qtshadertools qtmultimedia
+          autodesktop: true
           cache: true
+
+      - name: Show resolved Qt paths
+        run: |
+          echo "Target Qt (wasm):  $QT_ROOT_DIR"
+          echo "Host Qt (desktop): $QT_HOST_PATH"
+          ls "$QT_ROOT_DIR" || true
+          ls "$QT_HOST_PATH" || true
 
       - name: Configure
         run: |
-          echo "Target Qt:  $QT_ROOT_DIR"
-          echo "Host Qt:    $QT_HOST_PATH"
           cmake -S . -B build-wasm \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" \

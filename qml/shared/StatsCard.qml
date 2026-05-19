@@ -7,10 +7,9 @@ Rectangle {
     property color cardColor: "#FAFAFA"
     property color textColor: "#212121"
     property color subTextColor: "#666666"
-    property int radius: 10
 
     color: cardColor
-    radius: root.radius
+    radius: 10
     border.color: "#E0E0E0"
     implicitHeight: col.implicitHeight + 24
     implicitWidth: 320
