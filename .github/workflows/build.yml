@@ -17,7 +17,7 @@ concurrency:
 
 env:
   QT_VERSION: 6.7.3
-  QT_WASM_VERSION: 6.7.0
+  QT_WASM_VERSION: 6.7.3
 
 jobs:
   linux:
@@ -248,7 +248,7 @@ jobs:
         uses: actions/deploy-pages@v4
 
   ios:
-    name: iOS (Simulator)
+    name: iOS (Device)
     runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
@@ -285,7 +285,7 @@ jobs:
             -DQT_HOST_PATH="$QT_HOST_PATH" \
             -DCMAKE_TOOLCHAIN_FILE="$QT_ROOT_DIR/lib/cmake/Qt6/qt.toolchain.cmake" \
             -DCMAKE_OSX_ARCHITECTURES="arm64" \
-            -DCMAKE_OSX_SYSROOT=iphonesimulator
+            -DCMAKE_OSX_SYSROOT=iphoneos
 
       - name: Build
         run: cmake --build build-ios --config Release --parallel
@@ -294,6 +294,6 @@ jobs:
         with:
           name: guessnumberx-ios
           path: |
-            build-ios/Release-iphonesimulator/*.app
+            build-ios/Release-iphoneos/*.app
             build-ios/**/*.app
           if-no-files-found: warn

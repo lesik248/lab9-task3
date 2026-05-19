@@ -135,6 +135,7 @@ if(NOT EMSCRIPTEN AND NOT ANDROID AND NOT IOS)
         src/settingsmanager.h src/settingsmanager.cpp
         src/platforminfo.h src/platforminfo.cpp
         src/localizer.h src/localizer.cpp
+        src/drophandler.h src/drophandler.cpp
     )
     target_include_directories(tst_integration PRIVATE src)
     target_link_libraries(tst_integration PRIVATE Qt6::Test Qt6::Quick Qt6::Qml Qt6::Gui)
