@@ -75,6 +75,7 @@ set(TS_FILES
 
 qt_add_translations(appGuessNumberX
     TS_FILES ${TS_FILES}
+    RESOURCE_PREFIX "/i18n"
     QM_FILES_OUTPUT_VARIABLE QM_FILES
 )
 
